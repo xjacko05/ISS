@@ -36,6 +36,33 @@ def generate_spectro(frames):
     ret = np.transpose(ret)
     return ret
 
+def butter_bandpass(lowcut, highcut, fs, ripple, atten):
+    nyq = fs / 2
+    low = lowcut / nyq
+    high = highcut / nyq
+    lowish = (lowcut - 50) / nyq
+    highish = (highcut + 50) / nyq
+    order, wn = signal.buttord([lowish, highish], [low, high], ripple, atten)
+    #print([low, high])
+    #print([lowish, highish])
+    #print(wn)
+    #print(order)
+    b, a = signal.butter(order, wn, btype='bandstop')
+    print("Filter coefficients for frequency ", (lowcut+highcut)/2, "\tare:\n", b, "\n", a, "\n\n")
+    #print("Filter coefficients for frequency ", (lowcut+highcut)/2, "\tare:\n", b/a, "\n\n")
+    #w, h = signal.freqz(b , a)
+    #templot = plt.figure(11, figsize=(7,4))
+    #plt.plot((16000 * 0.5 / np.pi) *w, abs(h))
+    #plt.show()
+    return b, a
+
+
+def butter_bandpass_filter(data, lowcut, highcut, fs, ripple, atten):
+    b, a = butter_bandpass(lowcut, highcut, fs, ripple, atten)
+    y = signal.lfilter(b, a, data)
+    return y
+
+
 show = False
 
 if 's' in sys.argv:
@@ -140,6 +167,163 @@ plt.xlabel('time[s]')
 plt.ylabel('frequency[Hz]')
 bar = plt.imshow(generate_spectro(preprocess(audio_4cos)), extent=[0,2.45,0,8000], origin='lower', aspect='auto')
 plt.colorbar(bar)
+if show:
+    plt.show()
+
+#task7
+filter_1 = butter_bandpass(650, 680, 16000, 3, 40)
+filter_2 = butter_bandpass(1315, 1345, 16000, 3, 40)
+filter_3 = butter_bandpass(1980, 2010, 16000, 3, 40)
+filter_4 = butter_bandpass(2645, 2675, 16000, 3, 40)
+
+
+
+fs, audio_vanilla = wavfile.read('../audio/xjacko05.wav')
+#audio_clean = butter_bandpass_filter(audio_vanilla, 650, 680, 16000, 3, 40)
+#audio_clean = butter_bandpass_filter(audio_clean, 1315, 1345, 16000, 3, 40)
+#audio_clean = butter_bandpass_filter(audio_clean, 1980, 2010, 16000, 3, 40)
+#audio_clean = butter_bandpass_filter(audio_clean, 2645, 2675, 16000, 3, 40)
+audio_clean = signal.lfilter(filter_1[0], filter_1[1], audio_vanilla)
+audio_clean = signal.lfilter(filter_2[0], filter_2[1], audio_clean)
+audio_clean = signal.lfilter(filter_3[0], filter_3[1], audio_clean)
+audio_clean = signal.lfilter(filter_4[0], filter_4[1], audio_clean)
+wavfile.write('../audio/clean_aaa.wav', 16000, audio_clean)
+
+impulse_input = np.ndarray((512))
+for i in range (0,512):
+    impulse_input[i] = 0
+impulse_input[0] = 1
+
+plt_filter_1 = plt.figure(7, figsize=(7,4))
+plt.title('Filter 1 (655 Hz) impulse response')
+plt.plot(signal.lfilter(filter_1[0], filter_1[1], impulse_input))
+if show:
+    plt.show()
+
+plt_filter_2 = plt.figure(8, figsize=(7,4))
+plt.title('Filter 2 (1330 Hz) impulse response')
+plt.plot(signal.lfilter(filter_2[0], filter_2[1], impulse_input))
+if show:
+    plt.show()
+
+plt_filter_3 = plt.figure(9, figsize=(7,4))
+plt.title('Filter 3 (1995 Hz) impulse response')
+plt.plot(signal.lfilter(filter_3[0], filter_3[1], impulse_input))
+if show:
+    plt.show()
+
+plt_filter_4 = plt.figure(10, figsize=(7,4))
+plt.title('Filter 4 (2660 Hz) impulse response')
+plt.plot(signal.lfilter(filter_4[0], filter_4[1], impulse_input))
+if show:
+    plt.show()
+
+#task8
+zero_pole_1 = signal.tf2zpk(filter_1[0], filter_1[1])
+
+plt.figure(99, figsize=(4,3.5))
+
+# jednotkova kruznice
+ang = np.linspace(0, 2*np.pi,100)
+plt.plot(np.cos(ang), np.sin(ang))
+
+# nuly, poly
+plt.scatter(np.real(zero_pole_1[0]), np.imag(zero_pole_1[0]), marker='o', facecolors='none', edgecolors='r', label='nuly')
+plt.scatter(np.real(zero_pole_1[1]), np.imag(zero_pole_1[1]), marker='x', color='g', label='póly')
+
+plt.gca().set_xlabel('Realná složka $\mathbb{R}\{$z$\}$')
+plt.gca().set_ylabel('Imaginarní složka $\mathbb{I}\{$z$\}$')
+
+plt.grid(alpha=0.5, linestyle='--')
+plt.legend(loc='upper right')
+
+plt.tight_layout()
+
+
+
+
+
+
+
+#task9
+freq_char_1 = signal.freqz(filter_1[0], filter_1[1])
+
+plt_freq_char_1_modul = plt.figure(11, figsize=(7,4))
+plt.plot(freq_char_1[0] / 2 / np.pi * fs, np.abs(freq_char_1[1]))
+plt.title('Module of Filter 1 (665 Hz) frequency characteristics $|H(e^{j\omega})|$')
+plt.xlabel('frequency[Hz]')
+if show:
+    plt.show()
+
+plt_freq_char_1_argument = plt.figure(12, figsize=(7,4))
+plt.plot(freq_char_1[0] / 2 / np.pi * fs, np.angle(freq_char_1[1]))
+plt.title('Argument of Filter 1 (665 Hz) frequency characteristics $\mathrm{arg}\ H(e^{j\omega})$')
+plt.xlabel('frequency[Hz]')
+if show:
+    plt.show()
+
+freq_char_2 = signal.freqz(filter_2[0], filter_2[1])
+
+plt_freq_char_2_modul = plt.figure(13, figsize=(7,4))
+plt.plot(freq_char_2[0] / 2 / np.pi * fs, np.abs(freq_char_2[1]))
+plt.title('Module of Filter 2 (1330 Hz) frequency characteristics $|H(e^{j\omega})|$')
+plt.xlabel('frequency[Hz]')
+if show:
+    plt.show()
+
+plt_freq_char_2_argument = plt.figure(14, figsize=(7,4))
+plt.plot(freq_char_2[0] / 2 / np.pi * fs, np.angle(freq_char_2[1]))
+plt.title('Argument of Filter 2 (1330 Hz) frequency characteristics $\mathrm{arg}\ H(e^{j\omega})$')
+plt.xlabel('frequency[Hz]')
+if show:
+    plt.show()
+
+freq_char_3 = signal.freqz(filter_3[0], filter_3[1])
+
+plt_freq_char_3_modul = plt.figure(15, figsize=(7,4))
+plt.plot(freq_char_3[0] / 2 / np.pi * fs, np.abs(freq_char_3[1]))
+plt.title('Module of Filter 3 (1995 Hz) frequency characteristics $|H(e^{j\omega})|$')
+plt.xlabel('frequency[Hz]')
+if show:
+    plt.show()
+
+plt_freq_char_3_argument = plt.figure(16, figsize=(7,4))
+plt.plot(freq_char_3[0] / 2 / np.pi * fs, np.angle(freq_char_3[1]))
+plt.title('Argument of Filter 3 (1995 Hz) frequency characteristics $\mathrm{arg}\ H(e^{j\omega})$')
+plt.xlabel('frequency[Hz]')
+if show:
+    plt.show()
+
+freq_char_4 = signal.freqz(filter_4[0], filter_4[1])
+
+plt_freq_char_4_modul = plt.figure(17, figsize=(7,4))
+plt.plot(freq_char_4[0] / 2 / np.pi * fs, np.abs(freq_char_4[1]))
+plt.title('Module of Filter 4 (2660 Hz) frequency characteristics $|H(e^{j\omega})|$')
+plt.xlabel('frequency[Hz]')
+if show:
+    plt.show()
+
+plt_freq_char_4_argument = plt.figure(18, figsize=(7,4))
+plt.plot(freq_char_4[0] / 2 / np.pi * fs, np.angle(freq_char_4[1]))
+plt.title('Argument of Filter 4 (2660 Hz) frequency characteristics $\mathrm{arg}\ H(e^{j\omega})$')
+plt.xlabel('frequency[Hz]')
 plt.show()
+
+"""
+_, ax = plt.subplots(11, 12, figsize=(8,3))
+
+ax[0].plot(freq_char_1[0] / 2 / np.pi * fs, np.abs(freq_char_1[1]))
+ax[0].set_xlabel('Frekvence [Hz]')
+ax[0].set_title('Modul frekvenční charakteristiky $|H(e^{j\omega})|$')
+
+ax[1].plot(freq_char_1[0] / 2 / np.pi * fs, np.angle(freq_char_1[1]))
+ax[1].set_xlabel('Frekvence [Hz]')
+ax[1].set_title('Argument frekvenční charakteristiky $\mathrm{arg}\ H(e^{j\omega})$')
+
+for ax1 in ax:
+    ax1.grid(alpha=0.5, linestyle='--')
+
+plt.tight_layout()
+"""
 
 print('FINISHED')
