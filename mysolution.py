@@ -176,19 +176,6 @@ filter_2 = butter_bandpass(1315, 1345, 16000, 3, 40)
 filter_3 = butter_bandpass(1980, 2010, 16000, 3, 40)
 filter_4 = butter_bandpass(2645, 2675, 16000, 3, 40)
 
-
-
-fs, audio_vanilla = wavfile.read('../audio/xjacko05.wav')
-#audio_clean = butter_bandpass_filter(audio_vanilla, 650, 680, 16000, 3, 40)
-#audio_clean = butter_bandpass_filter(audio_clean, 1315, 1345, 16000, 3, 40)
-#audio_clean = butter_bandpass_filter(audio_clean, 1980, 2010, 16000, 3, 40)
-#audio_clean = butter_bandpass_filter(audio_clean, 2645, 2675, 16000, 3, 40)
-audio_clean = signal.lfilter(filter_1[0], filter_1[1], audio_vanilla)
-audio_clean = signal.lfilter(filter_2[0], filter_2[1], audio_clean)
-audio_clean = signal.lfilter(filter_3[0], filter_3[1], audio_clean)
-audio_clean = signal.lfilter(filter_4[0], filter_4[1], audio_clean)
-wavfile.write('../audio/clean_aaa.wav', 16000, audio_clean)
-
 impulse_input = np.ndarray((512))
 for i in range (0,512):
     impulse_input[i] = 0
@@ -219,44 +206,81 @@ if show:
     plt.show()
 
 #task8
-zero_pole_1 = signal.tf2zpk(filter_1[0], filter_1[1])
-
-plt.figure(99, figsize=(4,3.5))
-
-# jednotkova kruznice
 ang = np.linspace(0, 2*np.pi,100)
+
+zero_pole_1 = signal.tf2zpk(filter_1[0], filter_1[1])
+plt.figure(11, figsize=(4,4))
 plt.plot(np.cos(ang), np.sin(ang))
-
-# nuly, poly
-plt.scatter(np.real(zero_pole_1[0]), np.imag(zero_pole_1[0]), marker='o', facecolors='none', edgecolors='r', label='nuly')
-plt.scatter(np.real(zero_pole_1[1]), np.imag(zero_pole_1[1]), marker='x', color='g', label='póly')
-
-plt.gca().set_xlabel('Realná složka $\mathbb{R}\{$z$\}$')
-plt.gca().set_ylabel('Imaginarní složka $\mathbb{I}\{$z$\}$')
-
+plt.scatter(np.real(zero_pole_1[0]), np.imag(zero_pole_1[0]), marker='o', facecolors='none', edgecolors='r', label='zeroes')
+plt.scatter(np.real(zero_pole_1[1]), np.imag(zero_pole_1[1]), marker='x', color='g', label='poles')
+plt.title('Filter 1 (665 Hz) zeroes and poles')
+plt.gca().set_xlabel('Imaginary $\mathbb{R}\{$z$\}$')
+plt.gca().set_ylabel('Real $\mathbb{I}\{$z$\}$')
+plt.gcf().subplots_adjust(bottom=0.13)
+plt.gcf().subplots_adjust(left=0.2)
 plt.grid(alpha=0.5, linestyle='--')
 plt.legend(loc='upper right')
+if show:
+    plt.tight_layout()
 
-plt.tight_layout()
+zero_pole_2 = signal.tf2zpk(filter_2[0], filter_2[1])
+plt.figure(12, figsize=(4,4))
+plt.plot(np.cos(ang), np.sin(ang))
+plt.scatter(np.real(zero_pole_2[0]), np.imag(zero_pole_2[0]), marker='o', facecolors='none', edgecolors='r', label='zeroes')
+plt.scatter(np.real(zero_pole_2[1]), np.imag(zero_pole_2[1]), marker='x', color='g', label='poles')
+plt.title('Filter 2 (1330 Hz) zeroes and poles')
+plt.gca().set_xlabel('Imaginary $\mathbb{R}\{$z$\}$')
+plt.gca().set_ylabel('Real $\mathbb{I}\{$z$\}$')
+plt.gcf().subplots_adjust(bottom=0.13)
+plt.gcf().subplots_adjust(left=0.2)
+plt.grid(alpha=0.5, linestyle='--')
+plt.legend(loc='upper right')
+if show:
+    plt.tight_layout()
 
+zero_pole_3 = signal.tf2zpk(filter_3[0], filter_3[1])
+plt.figure(13, figsize=(4,4))
+plt.plot(np.cos(ang), np.sin(ang))
+plt.scatter(np.real(zero_pole_3[0]), np.imag(zero_pole_3[0]), marker='o', facecolors='none', edgecolors='r', label='zeroes')
+plt.scatter(np.real(zero_pole_3[1]), np.imag(zero_pole_3[1]), marker='x', color='g', label='poles')
+plt.title('Filter 3 (1995 Hz) zeroes and poles')
+plt.gca().set_xlabel('Imaginary $\mathbb{R}\{$z$\}$')
+plt.gca().set_ylabel('Real $\mathbb{I}\{$z$\}$')
+plt.gcf().subplots_adjust(bottom=0.13)
+plt.gcf().subplots_adjust(left=0.2)
+plt.grid(alpha=0.5, linestyle='--')
+plt.legend(loc='upper right')
+if show:
+    plt.tight_layout()
 
-
-
-
+zero_pole_4 = signal.tf2zpk(filter_4[0], filter_4[1])
+plt.figure(14, figsize=(4,4))
+plt.plot(np.cos(ang), np.sin(ang))
+plt.scatter(np.real(zero_pole_4[0]), np.imag(zero_pole_4[0]), marker='o', facecolors='none', edgecolors='r', label='zeroes')
+plt.scatter(np.real(zero_pole_4[1]), np.imag(zero_pole_4[1]), marker='x', color='g', label='poles')
+plt.title('Filter 4 (2660 Hz) zeroes and poles')
+plt.gca().set_xlabel('Imaginary $\mathbb{R}\{$z$\}$')
+plt.gca().set_ylabel('Real $\mathbb{I}\{$z$\}$')
+plt.gcf().subplots_adjust(bottom=0.13)
+plt.gcf().subplots_adjust(left=0.2)
+plt.grid(alpha=0.5, linestyle='--')
+plt.legend(loc='upper right')
+if show:
+    plt.tight_layout()
 
 
 #task9
 freq_char_1 = signal.freqz(filter_1[0], filter_1[1])
 
-plt_freq_char_1_modul = plt.figure(11, figsize=(7,4))
-plt.plot(freq_char_1[0] / 2 / np.pi * fs, np.abs(freq_char_1[1]))
+plt_freq_char_1_modul = plt.figure(15, figsize=(7,4))
+plt.plot(freq_char_1[0][int(465/8000*512):int(865/8000*512)] / 2 / np.pi * fs, np.abs(freq_char_1[1][int(465/8000*512):int(865/8000*512)]))
 plt.title('Module of Filter 1 (665 Hz) frequency characteristics $|H(e^{j\omega})|$')
 plt.xlabel('frequency[Hz]')
 if show:
     plt.show()
 
-plt_freq_char_1_argument = plt.figure(12, figsize=(7,4))
-plt.plot(freq_char_1[0] / 2 / np.pi * fs, np.angle(freq_char_1[1]))
+plt_freq_char_1_argument = plt.figure(16, figsize=(7,4))
+plt.plot(freq_char_1[0][int(265/8000*512):int(1065/8000*512)] / 2 / np.pi * fs, np.angle(freq_char_1[1][int(265/8000*512):int(1065/8000*512)]))
 plt.title('Argument of Filter 1 (665 Hz) frequency characteristics $\mathrm{arg}\ H(e^{j\omega})$')
 plt.xlabel('frequency[Hz]')
 if show:
@@ -264,15 +288,15 @@ if show:
 
 freq_char_2 = signal.freqz(filter_2[0], filter_2[1])
 
-plt_freq_char_2_modul = plt.figure(13, figsize=(7,4))
-plt.plot(freq_char_2[0] / 2 / np.pi * fs, np.abs(freq_char_2[1]))
+plt_freq_char_2_modul = plt.figure(17, figsize=(7,4))
+plt.plot(freq_char_2[0][int(1130/8000*512):int(1530/8000*512)] / 2 / np.pi * fs, np.abs(freq_char_2[1][int(1130/8000*512):int(1530/8000*512)]))
 plt.title('Module of Filter 2 (1330 Hz) frequency characteristics $|H(e^{j\omega})|$')
 plt.xlabel('frequency[Hz]')
 if show:
     plt.show()
 
-plt_freq_char_2_argument = plt.figure(14, figsize=(7,4))
-plt.plot(freq_char_2[0] / 2 / np.pi * fs, np.angle(freq_char_2[1]))
+plt_freq_char_2_argument = plt.figure(18, figsize=(7,4))
+plt.plot(freq_char_2[0][int(930/8000*512):int(1730/8000*512)] / 2 / np.pi * fs, np.angle(freq_char_2[1][int(930/8000*512):int(1730/8000*512)]))
 plt.title('Argument of Filter 2 (1330 Hz) frequency characteristics $\mathrm{arg}\ H(e^{j\omega})$')
 plt.xlabel('frequency[Hz]')
 if show:
@@ -280,15 +304,15 @@ if show:
 
 freq_char_3 = signal.freqz(filter_3[0], filter_3[1])
 
-plt_freq_char_3_modul = plt.figure(15, figsize=(7,4))
-plt.plot(freq_char_3[0] / 2 / np.pi * fs, np.abs(freq_char_3[1]))
+plt_freq_char_3_modul = plt.figure(19, figsize=(7,4))
+plt.plot(freq_char_3[0][int(1795/8000*512):int(2195/8000*512)] / 2 / np.pi * fs, np.abs(freq_char_3[1][int(1795/8000*512):int(2195/8000*512)]))
 plt.title('Module of Filter 3 (1995 Hz) frequency characteristics $|H(e^{j\omega})|$')
 plt.xlabel('frequency[Hz]')
 if show:
     plt.show()
 
-plt_freq_char_3_argument = plt.figure(16, figsize=(7,4))
-plt.plot(freq_char_3[0] / 2 / np.pi * fs, np.angle(freq_char_3[1]))
+plt_freq_char_3_argument = plt.figure(20, figsize=(7,4))
+plt.plot(freq_char_3[0][int(1595/8000*512):int(2395/8000*512)] / 2 / np.pi * fs, np.angle(freq_char_3[1][int(1595/8000*512):int(2395/8000*512)]))
 plt.title('Argument of Filter 3 (1995 Hz) frequency characteristics $\mathrm{arg}\ H(e^{j\omega})$')
 plt.xlabel('frequency[Hz]')
 if show:
@@ -296,34 +320,35 @@ if show:
 
 freq_char_4 = signal.freqz(filter_4[0], filter_4[1])
 
-plt_freq_char_4_modul = plt.figure(17, figsize=(7,4))
-plt.plot(freq_char_4[0] / 2 / np.pi * fs, np.abs(freq_char_4[1]))
+plt_freq_char_4_modul = plt.figure(21, figsize=(7,4))
+plt.plot(freq_char_4[0][int(2460/8000*512):int(2860/8000*512)] / 2 / np.pi * fs, np.abs(freq_char_4[1][int(2460/8000*512):int(2860/8000*512)]))
 plt.title('Module of Filter 4 (2660 Hz) frequency characteristics $|H(e^{j\omega})|$')
 plt.xlabel('frequency[Hz]')
 if show:
     plt.show()
 
-plt_freq_char_4_argument = plt.figure(18, figsize=(7,4))
-plt.plot(freq_char_4[0] / 2 / np.pi * fs, np.angle(freq_char_4[1]))
+plt_freq_char_4_argument = plt.figure(22, figsize=(7,4))
+plt.plot(freq_char_4[0][int(2260/8000*512):int(3060/8000*512)] / 2 / np.pi * fs, np.angle(freq_char_4[1][int(2260/8000*512):int(3060/8000*512)]))
 plt.title('Argument of Filter 4 (2660 Hz) frequency characteristics $\mathrm{arg}\ H(e^{j\omega})$')
 plt.xlabel('frequency[Hz]')
-plt.show()
+if show:
+    plt.show()
 
-"""
-_, ax = plt.subplots(11, 12, figsize=(8,3))
 
-ax[0].plot(freq_char_1[0] / 2 / np.pi * fs, np.abs(freq_char_1[1]))
-ax[0].set_xlabel('Frekvence [Hz]')
-ax[0].set_title('Modul frekvenční charakteristiky $|H(e^{j\omega})|$')
+#task 10
 
-ax[1].plot(freq_char_1[0] / 2 / np.pi * fs, np.angle(freq_char_1[1]))
-ax[1].set_xlabel('Frekvence [Hz]')
-ax[1].set_title('Argument frekvenční charakteristiky $\mathrm{arg}\ H(e^{j\omega})$')
+fs, audio_vanilla = wavfile.read('../audio/xjacko05.wav')
 
-for ax1 in ax:
-    ax1.grid(alpha=0.5, linestyle='--')
+audio_clean = signal.lfilter(filter_1[0], filter_1[1], audio_vanilla)
+audio_clean = signal.lfilter(filter_2[0], filter_2[1], audio_clean)
+audio_clean = signal.lfilter(filter_3[0], filter_3[1], audio_clean)
+audio_clean = signal.lfilter(filter_4[0], filter_4[1], audio_clean)
 
-plt.tight_layout()
-"""
+if np.abs(audio_clean.max()) > np.abs(audio_clean.min()):
+    audio_clean = audio_clean / np.abs(audio_clean.max())
+else:
+    audio_clean = audio_clean / np.abs(audio_clean.min())
+
+wavfile.write('../audio/clean_bandstop.wav', fs, audio_clean)
 
 print('FINISHED')
